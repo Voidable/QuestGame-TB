@@ -5,3 +5,6 @@ C:\Users\kcabinaw\Documents\GitHub\QuestGame-TB\GuestGame-TB\bin\Debug\GuestGame
 C:\Users\kcabinaw\Documents\GitHub\QuestGame-TB\GuestGame-TB\obj\Debug\GuestGame-TB.csprojResolveAssemblyReference.cache
 C:\Users\kcabinaw\Documents\GitHub\QuestGame-TB\GuestGame-TB\obj\Debug\GuestGame-TB.exe
 C:\Users\kcabinaw\Documents\GitHub\QuestGame-TB\GuestGame-TB\obj\Debug\GuestGame-TB.pdb
+C:\Users\Cabin\Documents\GitHub\QuestGame-TB\GuestGame-TB\bin\Debug\GuestGame-TB.exe.config
+C:\Users\Cabin\Documents\GitHub\QuestGame-TB\GuestGame-TB\obj\Debug\GuestGame-TB.exe
+C:\Users\Cabin\Documents\GitHub\QuestGame-TB\GuestGame-TB\obj\Debug\GuestGame-TB.pdb
