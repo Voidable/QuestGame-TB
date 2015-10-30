@@ -35,6 +35,8 @@ namespace GuestGame_TB
         //  Object holders
         private Player _myPlayer;
         private Building _myBuilding;
+        private StaffList _myStaff;
+        private GuardList _myGuards;
 
         #endregion // End of [ FIELDS ] region
 
@@ -58,6 +60,24 @@ namespace GuestGame_TB
         public void InitializeBuildingReference(Building building)
         {
             _myBuilding = building;
+        }
+
+        /// <summary>
+        /// Creates the reference to the stafflist for the ConsoleView
+        /// </summary>
+        /// <param name="player"></param>
+        public void InitializeStaffReference(StaffList staff)
+        {
+            _myStaff = staff;
+        }
+
+        /// <summary>
+        /// Creates the reference to the guardList for the ConsoleView
+        /// </summary>
+        /// <param name="player"></param>
+        public void InitializeGuardReference(GuardList guards)
+        {
+            _myGuards = guards;
         }
         #endregion // End of [ INITIALIZER METHODS ] region
 

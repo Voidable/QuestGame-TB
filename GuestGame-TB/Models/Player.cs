@@ -19,7 +19,6 @@ namespace GuestGame_TB
         #endregion // End of [ FIELDS ] region
 
 
-
         #region [ PROPERTIES ]
 
         public List<Item> Inventory

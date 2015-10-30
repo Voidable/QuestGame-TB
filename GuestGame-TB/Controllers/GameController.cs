@@ -13,6 +13,8 @@ namespace GuestGame_TB
         Player _myPlayer;
         Building _myBuilding;
         ConsoleView _myView;
+        StaffList _myStaff;
+        GuardList _myGuards;
 
         #endregion // End of [ FIELDS ] region
 
@@ -42,12 +44,18 @@ namespace GuestGame_TB
                 _myView.InitializeBuildingReference(_myBuilding);
 
                 //  Create StaffList
+                _myStaff = new StaffList();
+                _myStaff.InitializeStaff();
 
                 //  Pass StaffList to view
+                _myView.InitializeStaffReference(_myStaff);
 
                 //  Create GuardList
+                _myGuards = new GuardList();
+                _myGuards.InitializeGuards();
 
                 //  Pass GuardList to view
+                _myView.InitializeGuardReference(_myGuards);
 
                 //  Play the game
                 PlayGame();
