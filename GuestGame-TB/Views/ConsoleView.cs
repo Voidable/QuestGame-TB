@@ -18,7 +18,8 @@ namespace GuestGame_TB
         //  Console colors
         //      Header
         private const ConsoleColor HEADER_BACKGROUND_COLOR = ConsoleColor.Gray;
-        private const ConsoleColor HEADER_TEXT_COLOR = ConsoleColor.Blue;
+        private const ConsoleColor HEADER_TITLE_TEXT_COLOR = ConsoleColor.Blue;
+        private const ConsoleColor HEADER_SUBTITLE_TEXT_COLOR = ConsoleColor.Red;
         //      Body
         private const ConsoleColor BODY_BACKGROUND_COLOR = ConsoleColor.Black;
         private const ConsoleColor BODY_TEXT_COLOR = ConsoleColor.White;
@@ -44,6 +45,7 @@ namespace GuestGame_TB
         #region [ METHODS ]
 
         #region [ INITIALIZER METHODS ]
+
         /// <summary>
         /// Creates the reference to the player for the ConsoleView
         /// </summary>
@@ -79,6 +81,7 @@ namespace GuestGame_TB
         {
             _myGuards = guards;
         }
+
         #endregion // End of [ INITIALIZER METHODS ] region
 
         #region [ DISPLAY METHODS ]
@@ -90,7 +93,7 @@ namespace GuestGame_TB
         {
             //  Set the colors for the header
             Console.BackgroundColor = HEADER_BACKGROUND_COLOR;
-            Console.ForegroundColor = HEADER_TEXT_COLOR;
+            Console.ForegroundColor = HEADER_TITLE_TEXT_COLOR;
 
             //  For each line in the Header
             for (int i = 0; i < CONSOLE_HEADER_HEIGHT; i++)
@@ -145,7 +148,7 @@ namespace GuestGame_TB
         {
             //  Set the colors for the header
             Console.BackgroundColor = HEADER_BACKGROUND_COLOR;
-            Console.ForegroundColor = HEADER_TEXT_COLOR;
+            Console.ForegroundColor = HEADER_TITLE_TEXT_COLOR;
 
             //  For each line in the Header
             for (int i = 0; i < CONSOLE_HEADER_HEIGHT; i++)
@@ -180,6 +183,9 @@ namespace GuestGame_TB
                 //  Third line contains the SUBTITLE
                 else if (i == HEADER_SUBTITLE_POSITION)
                 {
+                    //  Subtitle Color
+                    Console.ForegroundColor = HEADER_SUBTITLE_TEXT_COLOR;
+
                     //  For the blank space before the text.
                     for (int j = 0; j < ((CONSOLE_WINDOW_WIDTH - subtitleMessage.Count()) / 2); j++)
                     {
@@ -195,6 +201,9 @@ namespace GuestGame_TB
                     {
                         Console.Write(" ");
                     }
+
+                    //  Reset color
+                    Console.ForegroundColor = HEADER_TITLE_TEXT_COLOR;
                 }
                 //  The remaining lines are just blank
                 else
@@ -259,6 +268,8 @@ namespace GuestGame_TB
         /// <returns></returns>
         public string GetUserInput()
         {
+            Console.WriteLine();
+
             return Console.ReadLine();
         }
 
@@ -269,14 +280,89 @@ namespace GuestGame_TB
         /// <returns></returns>
         public string GetUserInput(string message)
         {
+            Console.WriteLine();
+
             Console.WriteLine(message);
             return Console.ReadLine();
         }
 
+        /// <summary>
+        /// Prompts the player to press a key to continue
+        /// </summary>
         public void WaitForAnyKey()
         {
             Console.WriteLine("\nPress any key to continue.");
             Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Given a room number, display's the rooms contents
+        /// </summary>
+        /// <param name="roomNumber"></param>
+        public void DisplayRoomContents(int roomNumber)
+        {
+            //  A list to hold the guards in the room
+            List<Guard> roomGuards = new List<Guard>();
+
+            //  A list to hold the staff in the room
+            List<Staff> roomStaff = new List<Staff>();
+
+            //  If a guard is in the room, add it to roomGuards
+            foreach (Guard g in _myGuards.Guards)
+            {
+                if (g.CurrentRoomNumber == roomNumber)
+                {
+                    roomGuards.Add(g);
+                }
+            }
+
+            //  If a staff member is in the rooom, add it to roomStaff
+            foreach (Staff s in _myStaff.StaffMembers)
+            {
+                if (s.CurrentRoomNumber == roomNumber)
+                {
+                    roomStaff.Add(s);
+                }
+            }
+
+            //  Get the room so we can get its items.
+            Room targetRoom = _myBuilding.Rooms.Find(x => x.RoomNumber - 1 == roomNumber);
+
+            // If there are guards, display the message.
+            if (roomGuards.Count != 0)
+            {
+                //  Start of the string
+                string guardLine = string.Format("There are {0} guards; ", roomGuards.Count);
+
+                foreach (Guard g in roomGuards)
+                {
+                    guardLine = string.Format(guardLine + g.Name + " ");
+                }
+
+                //  Display the string
+                DisplayMessage(guardLine, false);
+            }
+
+            //  If there are staff, display the message.
+            if (roomStaff.Count != 0)
+            {
+                //  Start of the string
+                string staffLine = string.Format("There are {0} staff members; ",roomStaff.Count);
+
+                foreach (Staff s in roomStaff)
+                {
+                    staffLine = string.Format(staffLine + s.Name + " ");
+                }
+
+                //  Display the string
+                DisplayMessage(staffLine, false);
+            }
+
+            //  If there are items, display them
+            foreach (Item i in targetRoom.RoomInventory)
+            {
+                DisplayMessage(string.Format("There is a" + i.Name + ", " + i.Description));
+            }
         }
 
         #endregion // End of [ DISPLAY METHODS ] region

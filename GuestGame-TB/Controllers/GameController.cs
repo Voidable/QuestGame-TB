@@ -8,13 +8,22 @@ namespace GuestGame_TB
 {
     class GameController
     {
+        //  Enum of valid Commands
+        public enum GameCommands
+        {
+            GO,
+            LOOK,
+            HELP
+        }
+
+
         #region [ FIELDS ]
 
-        Player _myPlayer;
-        Building _myBuilding;
-        ConsoleView _myView;
-        StaffList _myStaff;
-        GuardList _myGuards;
+        Player _player;
+        Building _building;
+        ConsoleView _view;
+        StaffList _staff;
+        GuardList _guards;
 
         #endregion // End of [ FIELDS ] region
 
@@ -35,31 +44,33 @@ namespace GuestGame_TB
                 CreatePlayer();
 
                 //  Pass player to view
-                _myView.InitializePlayerReference(_myPlayer);
+                _view.InitializePlayerReference(_player);
 
                 //  Create building
-                _myBuilding = new Building();
+                _building = new Building();
 
                 //  Pass building to view
-                _myView.InitializeBuildingReference(_myBuilding);
+                _view.InitializeBuildingReference(_building);
 
                 //  Create StaffList
-                _myStaff = new StaffList();
-                _myStaff.InitializeStaff();
+                _staff = new StaffList();
+                _staff.InitializeStaff();
 
                 //  Pass StaffList to view
-                _myView.InitializeStaffReference(_myStaff);
+                _view.InitializeStaffReference(_staff);
 
                 //  Create GuardList
-                _myGuards = new GuardList();
-                _myGuards.InitializeGuards();
+                _guards = new GuardList();
+                _guards.InitializeGuards();
 
                 //  Pass GuardList to view
-                _myView.InitializeGuardReference(_myGuards);
+                _view.InitializeGuardReference(_guards);
 
                 //  Play the game
                 PlayGame();
             }
+
+            //  Application Closes at this point
 
         }
 
@@ -68,7 +79,7 @@ namespace GuestGame_TB
         /// </summary>
         public void InitializeView()
         {
-            _myView = new ConsoleView();
+            _view = new ConsoleView();
         }
 
         /// <summary>
@@ -79,16 +90,16 @@ namespace GuestGame_TB
         {
             bool output = false;
             bool validInput = false;
-            _myView.DisplayClear();
+            _view.DisplayClear();
 
-            _myView.DisplayMessage("Welcome to the game; Aztecan Corporation Protoype Heist.", true);
-            _myView.DisplayMessage("Type \"Continue\" to play, or \"Quit\" to exit",false);
+            _view.DisplayMessage("Welcome to the game; Aztecan Corporation Protoype Heist.", true);
+            _view.DisplayMessage("Type \"Continue\" to play, or \"Quit\" to exit",false);
 
             string input; 
 
             while (!validInput)
             {
-                input = _myView.GetUserInput();
+                input = _view.GetUserInput();
 
                 if (input.ToUpper() == "CONTINUE")
                 {
@@ -102,7 +113,7 @@ namespace GuestGame_TB
                 } 
                 else
                 {
-                    _myView.DisplayMessage("That was not a valid command. The valid commands are \"Continue\" and \"Quit\"",true);
+                    _view.DisplayMessage("That was not a valid command. The valid commands are \"Continue\" and \"Quit\"",true);
                 }
             }
 
@@ -115,64 +126,64 @@ namespace GuestGame_TB
         /// </summary>
         public void CreatePlayer()
         {
-            _myView.DisplayClear(); //  Blank screen
+            _view.DisplayClear(); //  Blank screen
 
             //  Get name
-            _myView.DisplayMessage("What is your name?");
-            string name = _myView.GetUserInput();
+            _view.DisplayMessage("What is your name?");
+            string name = _view.GetUserInput();
 
             //  Echo inputs
-            _myView.DisplayMessage(string.Format("Your name is {0}",name));
-            _myView.WaitForAnyKey();
+            _view.DisplayMessage(string.Format("Your name is {0}",name));
+            _view.WaitForAnyKey();
 
-            _myView.DisplayClear(); //  Blank screen
+            _view.DisplayClear(); //  Blank screen
 
             //  Get gender
-            _myView.DisplayMessage("Are you male or female?");
+            _view.DisplayMessage("Are you male or female?");
             bool validGender = false;
             Character.Genders gender = Character.Genders.MALE;
             //  Loop until a valid input
             while (!validGender)
             {
-                if (Enum.TryParse<Character.Genders>(_myView.GetUserInput(),true,out gender))
+                if (Enum.TryParse<Character.Genders>(_view.GetUserInput(),true,out gender))
                 {
                     validGender = true;
                 }
                 else
                 {
-                    _myView.DisplayMessage("That was not a valid gender, try again.");
+                    _view.DisplayMessage("That was not a valid gender, try again.");
                 }
             }
 
             //  Echo inputs
-            _myView.DisplayMessage(string.Format("Your name is {0}", name));
-            _myView.DisplayMessage(string.Format("You are {0}", gender.ToString()),false);
-            _myView.WaitForAnyKey();
+            _view.DisplayMessage(string.Format("Your name is {0}", name));
+            _view.DisplayMessage(string.Format("You are {0}", gender.ToString()),false);
+            _view.WaitForAnyKey();
 
-            _myView.DisplayClear(); //  Blank screen
+            _view.DisplayClear(); //  Blank screen
 
-            _myView.DisplayMessage("What is your race?");
+            _view.DisplayMessage("What is your race?");
             foreach (Character.Races r in Enum.GetValues(typeof(Character.Races)))
             {
-                _myView.DisplayMessage(r.ToString(), false);
+                _view.DisplayMessage(r.ToString(), false);
             }
             bool validRace = false;
             Character.Races race = Character.Races.HUMAN;
             while (!validRace)
             {
-                if (Enum.TryParse<Character.Races>(_myView.GetUserInput(),true,out race))
+                if (Enum.TryParse<Character.Races>(_view.GetUserInput(),true,out race))
                 {
                     validRace = true;
                 }
                 else
                 {
-                    _myView.DisplayMessage("That was not a valid race, try again.");
+                    _view.DisplayMessage("That was not a valid race, try again.");
                 }
             }
 
             //  Echo inputs
-            _myView.DisplayMessage(string.Format("Your name is {0}", name));
-            _myView.DisplayMessage(string.Format("You are {0}", gender.ToString()),false);
+            _view.DisplayMessage(string.Format("Your name is {0}", name));
+            _view.DisplayMessage(string.Format("You are {0}", gender.ToString()),false);
 
             //  Make a into an for grammar reasons.
             string aSuffix = "";
@@ -181,11 +192,11 @@ namespace GuestGame_TB
                 aSuffix = "n";
             }
 
-            _myView.DisplayMessage(string.Format("You are a{0} {1}",aSuffix, race.ToString()),false);
-            _myView.WaitForAnyKey();
+            _view.DisplayMessage(string.Format("You are a{0} {1}",aSuffix, race.ToString()),false);
+            _view.WaitForAnyKey();
 
             //  Create the player
-            _myPlayer = new Player(name, "You are the Player", gender, race);
+            _player = new Player(name, "You are the Player", gender, race);
 
         }
 
@@ -193,6 +204,42 @@ namespace GuestGame_TB
         /// Runs the game's logic loop
         /// </summary>
         public void PlayGame()
+        {
+            _view.DisplayClear();
+            bool playingGame = true;
+
+            //  Tell the user of their goal
+            _view.DisplayMessage("You are a thief.");
+            _view.DisplayMessage("Your goal is to steal a prototype device from the lab hidden in this building.");
+            _view.DisplayMessage("Due to budget-cuts, you have no gear to start with.");
+            _view.DisplayMessage("The \"Help\" command will tell you the basics, should you need them.");
+            _view.WaitForAnyKey();
+
+            while (playingGame)
+            {
+                //  This draws the header with the name of the room in the header.
+                _view.DisplayClear(
+                    //  Find the room in the list, where the room's number matches the players current room.
+                    (_building.Rooms.Find(x => x.RoomNumber - 1 == _player.CurrentRoomNumber)
+                    //                  x.RoomNumber is 1-base. Player.CurrentRoom# is 0-base.
+                    //  Then get the Name string.
+                    .Name));
+
+                //  Get the current rooms description.
+                string roomDesc = _building.Rooms.Find(x => x.RoomNumber - 1 == _player.CurrentRoomNumber).Description;
+
+                //  Display the current rooms description
+                _view.DisplayMessage(roomDesc);
+
+                //  Display the room's contents
+                _view.DisplayRoomContents(_player.CurrentRoomNumber);
+
+                //  Get the player's input
+                string input = _view.GetUserInput();
+            }
+        }
+
+        public void EvaluatePlayerCommand(string commandInput)
         {
 
         }
