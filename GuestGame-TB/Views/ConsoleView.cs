@@ -26,7 +26,7 @@ namespace GuestGame_TB
         //  Header text
         private const string HEADER_TITLE_TEXT = "Aztecan Corporation Prototype Heist";
         private static readonly int HEADER_TITLE_SPACE = (CONSOLE_WINDOW_WIDTH - HEADER_TITLE_TEXT.Count()) / 2;
-        //  "static readonly" is because const only works at compile time. using string.Count() only occurs when the program is running.
+        //  "static read-only" is because constant only works at compile time. using string.Count() only occurs when the program is running.
 
         //  Header positions
         private const int HEADER_TITLE_POSITION = 1;
@@ -63,7 +63,7 @@ namespace GuestGame_TB
         }
 
         /// <summary>
-        /// Creates the reference to the stafflist for the ConsoleView
+        /// Creates the reference to the staffList for the ConsoleView
         /// </summary>
         /// <param name="player"></param>
         public void InitializeStaffReference(StaffList staff)
