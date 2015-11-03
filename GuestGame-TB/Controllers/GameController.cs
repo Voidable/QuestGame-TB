@@ -8,6 +8,7 @@ namespace GuestGame_TB
 {
     class GameController
     {
+<<<<<<< HEAD
         //  Enum of valid Commands
         public enum GameCommands
         {
@@ -17,6 +18,38 @@ namespace GuestGame_TB
         }
 
 
+=======
+        #region [ ENUMS ]
+        public enum GameCommands
+        {
+            HELP,
+            GO
+        }
+
+        public enum GameDirections
+        {
+            NORTH,
+            NORTHEAST,
+            EAST,
+            SOUTHEAST,
+            SOUTH,
+            SOUTHWEST,
+            WEST,
+            NORTHWEST,
+            UP,
+            DOWN
+        }
+        #endregion // End of [ ENUMS ] region
+
+        public delegate void CommandDelegate(string input);
+
+        public Dictionary<GameCommands, CommandDelegate> commandDictionary = new Dictionary<GameCommands, CommandDelegate>
+            {
+                {GameCommands.GO, MovePlayer },
+                {GameCommands.HELP, HelpQuery },
+            };
+            
+>>>>>>> origin/master
         #region [ FIELDS ]
 
         Player _player;
@@ -26,6 +59,7 @@ namespace GuestGame_TB
         GuardList _guards;
 
         #endregion // End of [ FIELDS ] region
+
 
         #region [ METHODS ]
 
@@ -205,6 +239,7 @@ namespace GuestGame_TB
         /// </summary>
         public void PlayGame()
         {
+<<<<<<< HEAD
             _view.DisplayClear();
             bool playingGame = true;
 
@@ -240,9 +275,73 @@ namespace GuestGame_TB
         }
 
         public void EvaluatePlayerCommand(string commandInput)
+=======
+            //  Boolean that determines if we are currently playing the game.
+            bool playingGame = true;
+
+            //  Core Game Loop
+            while (playingGame)
+            {
+                //  Clear the display
+                _view.DisplayClear();
+
+                //  Display room information
+
+                //  Get input from player
+                string playerInput = _view.GetUserInput();
+
+                //  Parse input to command
+                //  Check the first word of the input string for a command verb
+                string firstWord = playerInput.Split(' ')[0];   //  I'll admit, I didn't think this would work.
+
+                //  Create a delegate - Help command by default
+                CommandDelegate commandChoice = HelpQuery;
+
+                //  Check each command for a match against the first word
+                bool foundMatch = false;
+                foreach (GameCommands e in Enum.GetValues(typeof(GameCommands)))
+                {
+                    if (firstWord.ToUpper() == e.ToString().ToUpper())
+                    {
+                        //  Assign delegate based on Enum value
+                        commandChoice = commandDictionary[e];
+
+                        //  Found a match
+                        foundMatch = true;
+                    }
+                }
+
+                //  If we found a match
+                if (foundMatch)
+                {
+                    //  perform command
+                    commandChoice(playerInput);
+                }
+                //  No match, tell the player their input could not be understood
+                else
+                {
+                    _view.DisplayMessage(string.Format("I didn't understand the word {0}", firstWord));
+                    _view.WaitForAnyKey();
+                }
+            }
+        }
+
+
+        #region [ COMMAND METHODS ]
+
+        public static void MovePlayer(string playerInput)
+>>>>>>> origin/master
         {
 
         }
+
+        public static void HelpQuery(string playerInput)
+        {
+
+        }
+
+        #endregion // End of [ COMMAND METHODS ] region
+
 
         #endregion // End of [ METHODS ] region
 
