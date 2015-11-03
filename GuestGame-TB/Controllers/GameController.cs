@@ -8,17 +8,7 @@ namespace GuestGame_TB
 {
     class GameController
     {
-<<<<<<< HEAD
-        //  Enum of valid Commands
-        public enum GameCommands
-        {
-            GO,
-            LOOK,
-            HELP
-        }
 
-
-=======
         #region [ ENUMS ]
         public enum GameCommands
         {
@@ -49,7 +39,6 @@ namespace GuestGame_TB
                 {GameCommands.HELP, HelpQuery },
             };
             
->>>>>>> origin/master
         #region [ FIELDS ]
 
         Player _player;
@@ -239,8 +228,10 @@ namespace GuestGame_TB
         /// </summary>
         public void PlayGame()
         {
-<<<<<<< HEAD
+            //  Clear the game screen
             _view.DisplayClear();
+
+            //  Boolean that determines if we are currently playing the game.
             bool playingGame = true;
 
             //  Tell the user of their goal
@@ -250,6 +241,7 @@ namespace GuestGame_TB
             _view.DisplayMessage("The \"Help\" command will tell you the basics, should you need them.");
             _view.WaitForAnyKey();
 
+            //  Core Game Loop
             while (playingGame)
             {
                 //  This draws the header with the name of the room in the header.
@@ -268,24 +260,6 @@ namespace GuestGame_TB
 
                 //  Display the room's contents
                 _view.DisplayRoomContents(_player.CurrentRoomNumber);
-
-                //  Get the player's input
-                string input = _view.GetUserInput();
-            }
-        }
-
-        public void EvaluatePlayerCommand(string commandInput)
-=======
-            //  Boolean that determines if we are currently playing the game.
-            bool playingGame = true;
-
-            //  Core Game Loop
-            while (playingGame)
-            {
-                //  Clear the display
-                _view.DisplayClear();
-
-                //  Display room information
 
                 //  Get input from player
                 string playerInput = _view.GetUserInput();
@@ -330,7 +304,6 @@ namespace GuestGame_TB
         #region [ COMMAND METHODS ]
 
         public static void MovePlayer(string playerInput)
->>>>>>> origin/master
         {
 
         }
