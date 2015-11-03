@@ -51,6 +51,9 @@ namespace GuestGame_TB
         private static StaffList _staff;
         private static GuardList _guards;
 
+        //  Boolean that determines if we are currently playing the game.
+        private static bool _playingGame = true;
+
         #endregion // End of [ FIELDS ] region
 
 
@@ -235,9 +238,6 @@ namespace GuestGame_TB
             //  Clear the game screen
             _view.DisplayClear();
 
-            //  Boolean that determines if we are currently playing the game.
-            bool playingGame = true;
-
             //  Tell the user of their goal
             _view.DisplayMessage("You are a thief.");
             _view.DisplayMessage("Your goal is to steal a prototype device from the lab hidden in this building.");
@@ -246,7 +246,7 @@ namespace GuestGame_TB
             _view.WaitForAnyKey();
 
             //  Core Game Loop
-            while (playingGame)
+            while (_playingGame)
             {
                 //  This draws the header with the name of the room in the header.
                 _view.DisplayClear(
@@ -344,6 +344,7 @@ namespace GuestGame_TB
             if (validInput == false)
             {
                 _view.DisplayMessage("There isn't a valid direction in your input.");
+                _view.WaitForAnyKey();
                 return;
             }
             //  Find the room with a 1-base room number that matches the 0-base player room.
@@ -364,12 +365,14 @@ namespace GuestGame_TB
                 {
                     //Building was incorrectly setup
                     _view.DisplayMessage(string.Format("Something went wrong, this Passage is in the wrong place! {0}",tempRoom.RoomNumber));
+                    _view.WaitForAnyKey();
                 }
             }
             else
             {
                 //  There is no passage in that direction, inform the player of this.
                 _view.DisplayMessage(string.Format("I can't go {0}",direction.ToString().ToLower()));
+                _view.WaitForAnyKey();
             }
         }
 
@@ -379,7 +382,18 @@ namespace GuestGame_TB
         /// <param name="playerInput"></param>
         public static void HelpQuery(string playerInput)
         {
+            _view.DisplayMessage("The recognized command verbs are:");
+            foreach (GameCommands c in Enum.GetValues(typeof(GameCommands)))
+            {
+                _view.DisplayMessage(c.ToString(), false);
+            }
+            _view.DisplayMessage("The recognized directions are:");
+            foreach (GameDirections d in Enum.GetValues(typeof(GameDirections)))
+            {
+                _view.DisplayMessage(d.ToString(), false);
+            }
 
+            _view.WaitForAnyKey();
         }
 
         /// <summary>
@@ -397,7 +411,14 @@ namespace GuestGame_TB
         /// <param name="playerInput"></param>
         public static void ConfirmExit(string playerInput)
         {
+            //  Prompt player for confirmation
+            string input = _view.GetUserInput("Are you sure you want to Quit? \"Yes\" \"No\"");
 
+            if (input.ToUpper() == "YES")
+            {
+                _playingGame = false;
+                _view.WaitForAnyKey();
+            }
         }
 
         #endregion // End of [ COMMAND METHODS ] region
