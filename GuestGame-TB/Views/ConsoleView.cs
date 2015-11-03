@@ -347,7 +347,7 @@ namespace GuestGame_TB
             if (roomStaff.Count != 0)
             {
                 //  Start of the string
-                string staffLine = string.Format("There are {0} staff members; ",roomStaff.Count);
+                string staffLine = string.Format("There are {0} staff members; ", roomStaff.Count);
 
                 foreach (Staff s in roomStaff)
                 {
@@ -361,7 +361,19 @@ namespace GuestGame_TB
             //  If there are items, display them
             foreach (Item i in targetRoom.RoomInventory)
             {
-                DisplayMessage(string.Format("There is a" + i.Name + ", " + i.Description));
+                DisplayMessage(string.Format("There is a " + i.Name),false);
+            }
+        }
+
+        /// <summary>
+        /// Display's all of the players items
+        /// </summary>
+        public void DisplayPlayerInventory()
+        {
+            DisplayMessage("I have: ");
+            foreach (Item i in _myPlayer.Inventory)
+            {
+                DisplayMessage(string.Format(i.Quantity + " " + i.Name + ", " + i.Description),false);
             }
         }
 

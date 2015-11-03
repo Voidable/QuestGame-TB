@@ -44,6 +44,18 @@ namespace GuestGame_TB
 
         #region [ METHODS ]
 
+        public int CurrentTotalInventory()
+        {
+            int total = 0;
+
+            foreach (Item i in _inventory)
+            {
+                total += i.Size;
+            }
+
+            return total;
+        }
+
         public override string FullDescription()
         {
             string output = "";

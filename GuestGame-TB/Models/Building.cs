@@ -103,6 +103,20 @@ namespace GuestGame_TB
             #endregion
         }
 
+        public void InitializeItems()
+        {
+            //  For testing, one Soda can on each side of the building.
+            Item can = new Item(Item.ItemTypes.SODACAN);
+            _rooms.ElementAt(0).RoomInventory.Add(can);
+            _rooms.ElementAt(1).RoomInventory.Add(can);
+            _rooms.ElementAt(2).RoomInventory.Add(can);
+            _rooms.ElementAt(3).RoomInventory.Add(can);
+
+            //  Keycard 001 in the eastern alley
+            Item card001 = new Item(Item.ItemTypes.KEYCARD001);
+            _rooms.ElementAt(1).RoomInventory.Add(card001);
+        }
+
         #endregion  //  End of [ METHODS ] region
 
 
@@ -118,6 +132,8 @@ namespace GuestGame_TB
             InitializeRooms();
 
             InitializePassages();
+
+            InitializeItems();
         }
 
         #endregion  //  End of [ CONSTRUCTORS ] region

@@ -10,7 +10,9 @@ namespace GuestGame_TB
     {
         public enum ItemTypes
         {
-            GENERIC
+            GENERIC,
+            KEYCARD001,
+            SODACAN
         }
 
         #region [ FIELDS ]
@@ -44,7 +46,7 @@ namespace GuestGame_TB
         /// <summary>
         /// Gets the Type of the Item
         /// </summary>
-        public ItemTypes Type 
+        public ItemTypes Type
         {
             get { return _type; }
         }
@@ -52,9 +54,9 @@ namespace GuestGame_TB
         /// <summary>
         /// Gets or Sets the Name of the Item
         /// </summary>
-        public string Name 
-        { 
-            get { return _name; } 
+        public string Name
+        {
+            get { return _name; }
             set { _name = value; }
         }
 
@@ -79,7 +81,7 @@ namespace GuestGame_TB
         /// <summary>
         /// Gets the Stackable state of the Item
         /// </summary>
-        public bool IsStackable 
+        public bool IsStackable
         {
             get { return _isStackable; }
         }
@@ -121,10 +123,49 @@ namespace GuestGame_TB
             _description = "It's so Generic I can't describe it.";
             _size = 0;
             _isStackable = true;
-            _quantity = 0;
+            _quantity = 1;
             _isVisibleOutsideInventory = true;
+        }
+
+        /// <summary>
+        /// Overloaded Constructor, defines item based on ItemType
+        /// </summary>
+        /// <param name="itemType"></param>
+        public Item(ItemTypes itemType)
+        {
+            switch (itemType)
+            {
+                case ItemTypes.KEYCARD001:
+                    _type = itemType;
+                    _name = "Key Card";
+                    _description = "This card belongs to Staff member John White";
+                    _size = 1;
+                    _isStackable = false;
+                    _quantity = 1;
+                    _isVisibleOutsideInventory = false;
+                    break;
+                case ItemTypes.SODACAN:
+                    _type = itemType;
+                    _name = "Soda Can";
+                    _description = "An empty Pipsi can.";
+                    _size = 3;
+                    _isStackable = false;
+                    _quantity = 1;
+                    _isVisibleOutsideInventory = true;
+                    break;
+                default:
+                    _type = ItemTypes.GENERIC;
+                    _name = "A very Generic, thing...";
+                    _description = "It's so Generic I can't describe it.";
+                    _size = 0;
+                    _isStackable = true;
+                    _quantity = 1;
+                    _isVisibleOutsideInventory = true;
+                    break;
+            }
         }
 
         #endregion  //  End of [ CONSTRUCTORS ] region
     }
 }
+

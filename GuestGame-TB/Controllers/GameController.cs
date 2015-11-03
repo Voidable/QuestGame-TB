@@ -12,10 +12,13 @@ namespace GuestGame_TB
         #region [ ENUMS ]
         public enum GameCommands
         {
-            HELP,
             GO,
-            QUIT,
-            LOOK
+            LOOK,
+            GRAB,
+            DROP,
+            INVENTORY,
+            HELP,
+            QUIT
         }
 
         public enum GameDirections
@@ -40,7 +43,10 @@ namespace GuestGame_TB
                 {GameCommands.GO, MovePlayer },
                 {GameCommands.HELP, HelpQuery },
                 {GameCommands.LOOK, LookAt },
-                {GameCommands.QUIT, ConfirmExit}
+                {GameCommands.QUIT, ConfirmExit},
+                {GameCommands.GRAB, GrabItem},
+                {GameCommands.DROP, DropItem},
+                {GameCommands.INVENTORY, ItemList}
             };
 
         #region [ FIELDS ]
@@ -169,7 +175,7 @@ namespace GuestGame_TB
             _view.DisplayClear(); //  Blank screen
 
             //  Get gender
-            _view.DisplayMessage("Are you male or female?");
+            _view.DisplayMessage("Are you MALE or FEMALE?");
             bool validGender = false;
             Character.Genders gender = Character.Genders.MALE;
             //  Loop until a valid input
@@ -364,14 +370,14 @@ namespace GuestGame_TB
                 else
                 {
                     //Building was incorrectly setup
-                    _view.DisplayMessage(string.Format("Something went wrong, this Passage is in the wrong place! {0}",tempRoom.RoomNumber));
+                    _view.DisplayMessage(string.Format("Something went wrong, this Passage is in the wrong place! {0}", tempRoom.RoomNumber));
                     _view.WaitForAnyKey();
                 }
             }
             else
             {
                 //  There is no passage in that direction, inform the player of this.
-                _view.DisplayMessage(string.Format("I can't go {0}",direction.ToString().ToLower()));
+                _view.DisplayMessage(string.Format("I can't go {0}", direction.ToString().ToLower()));
                 _view.WaitForAnyKey();
             }
         }
@@ -402,7 +408,94 @@ namespace GuestGame_TB
         /// <param name="playerInput"></param>
         public static void LookAt(string playerInput)
         {
+            //  Split the input into words
+            string[] words = playerInput.Split(' ');
+            string target = "";
+            bool foundTarget = false;
 
+            // A single word, or two words with the second being "AT" means insufficient input
+            if ((words.Count() <= 1) || (words.Count() == 2 & words[1].ToUpper() == "AT"))
+            {
+                _view.DisplayMessage("You need to tell me what to look at.");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Two words where the second isn't "AT" assume second word is target
+            else if (words.Count() == 2 & words[1].ToUpper() != "AT")
+            {
+                target = words[1].ToUpper();
+            }
+
+            //  Three words where the second is "AT", assume third word is target
+            else if (words.Count() == 3 & words[1].ToUpper() == "AT")
+            {
+                target = words[2].ToUpper();
+            }
+
+            //  Couldn't interpret the input based on prior rules
+            else
+            {
+                _view.DisplayMessage("I couldn't understand that. I understand \"Look NOUN\" and \"Look at NOUN\".");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Check if the target is the player
+            string[] playerReference = new string[] { "ME", "MYSELF" };
+            if (playerReference.Contains(target))
+            {
+                _view.DisplayMessage(_player.FullDescription());
+                foundTarget = true;
+            }
+
+            //  Check the guards for target match
+            foreach (Guard g in _guards.Guards)
+            {
+                if (g.CurrentRoomNumber == _player.CurrentRoomNumber)
+                {
+                    if (g.Name.ToUpper() == target)
+                    {
+                        _view.DisplayMessage(g.FullDescription());
+                        foundTarget = true;
+                    }
+                }
+            }
+
+            //  Check the staff for target match
+            foreach (Staff s in _staff.StaffMembers)
+            {
+                if (s.CurrentRoomNumber == _player.CurrentRoomNumber)
+                {
+                    if (s.Name.ToUpper() == target)
+                    {
+                        _view.DisplayMessage(s.FullDescription());
+                        foundTarget = true;
+                    }
+                }
+            }
+
+            //  Check the items for target match
+            foreach
+                //  Get the Item inventory of the current room
+                (Item i in _building.Rooms.Find
+                //  x.RoomNumber is 1-base. _player.CurrentRoomNumber is 0-base
+                (x => x.RoomNumber - 1 == _player.CurrentRoomNumber).RoomInventory)
+            {
+                if (i.Name.ToUpper() == target)
+                {
+                    _view.DisplayMessage(i.Description);
+                    foundTarget = true;
+                }
+            }
+
+            if (!foundTarget)
+            {
+                _view.DisplayMessage(string.Format("I cant see anything called {0}", target.ToLower()));
+            }
+
+            //  Wait for the player before refreshing the view.
+            _view.WaitForAnyKey();
         }
 
         /// <summary>
@@ -419,6 +512,225 @@ namespace GuestGame_TB
                 _playingGame = false;
                 _view.WaitForAnyKey();
             }
+        }
+
+        /// <summary>
+        /// Command to Grab an item
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public static void GrabItem(string playerInput)
+        {
+            //  Split the input into words
+            string[] words = playerInput.Split(' ');
+            string target = "";
+            bool foundTarget = false;
+
+            // A single word means insufficient input
+            if ((words.Count() <= 1))
+            {
+                _view.DisplayMessage("You need to tell me what to grab.");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Two words assume second word is target
+            else if (words.Count() >= 2)
+            {
+                target = words[1].ToUpper();
+            }
+
+            //  Couldn't interpret the input based on prior rules
+            else
+            {
+                _view.DisplayMessage("I couldn't understand that. I understand \"Grab NOUN\"");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Check the items for target match
+            Room tempRoom = _building.Rooms.Find
+                (x => x.RoomNumber - 1 == _player.CurrentRoomNumber);
+            //  x.RoomNumber is 1-base. _player.CurrentRoomNumber is 0-base
+
+            //  Get the Item inventory of the current room
+            foreach(Item i in tempRoom.RoomInventory)
+            {
+                //  Found the target item - using Contains incase of multi word names
+                if (i.Name.ToUpper().Contains(target))
+                {
+                    foundTarget = true;
+
+                    //  Items too large to be picked up
+                    if (i.Size > _player.InventorySize)
+                    {
+                        _view.DisplayMessage("I can't pick that up, its too big.");
+                        _view.WaitForAnyKey();
+                        break;
+                    }
+
+                    //  Stackable items
+                    if (i.IsStackable)
+                    {
+                        //  Player has already has one of said item
+                        if (_player.Inventory.Contains(i))
+                        {
+                            //  Add one to the stack
+                            _player.Inventory.Find(x => x.Type == i.Type).Quantity++;
+                            tempRoom.RoomInventory.Remove(i);
+                            break;
+                        }
+
+                        //  Player does not have one of said item
+                        else
+                        {
+                            //  Player has room in their inventory
+                            if (_player.CurrentTotalInventory() + i.Size <= _player.InventorySize)
+                            {
+                                _player.Inventory.Add(i);
+                                tempRoom.RoomInventory.Remove(i);
+                                break;
+                            }
+
+                            //  Player has insufficient room in their inventory
+                            else
+                            {
+                                _view.DisplayMessage("I don't have room in my bag for that.");
+                                _view.WaitForAnyKey();
+                                break;
+                            }
+                        }
+                    }
+
+                    //  Non-stackable
+                    else
+                    {
+                        //  Player has room in their inventory
+                        if (_player.CurrentTotalInventory() + i.Size <= _player.InventorySize)
+                        {
+                            _player.Inventory.Add(i);
+                            tempRoom.RoomInventory.Remove(i);
+                            break;
+                        }
+
+                        //  Player has insufficient room in their inventory
+                        else
+                        {
+                            _view.DisplayMessage("I don't have room in my bag for that.");
+                            _view.WaitForAnyKey();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //  There is no item with that name
+            if (!foundTarget)
+            {
+                _view.DisplayMessage(string.Format("I can't see a {0} here", target));
+            }
+        }
+
+        /// <summary>
+        /// Command to Drop an item
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public static void DropItem(string playerInput)
+        {
+            //  Split the input into words
+            string[] words = playerInput.Split(' ');
+            string target = "";
+            bool foundTarget = false;
+
+            // A single word means insufficient input
+            if ((words.Count() <= 1))
+            {
+                _view.DisplayMessage("You need to tell me what to drop.");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Two words assume second word is target
+            else if (words.Count() >= 2)
+            {
+                target = words[1].ToUpper();
+            }
+
+            //  Couldn't interpret the input based on prior rules
+            else
+            {
+                _view.DisplayMessage("I couldn't understand that. I understand \"Drop NOUN\"");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Create reference to current room so we could drop the item
+            Room tempRoom = _building.Rooms.Find
+                (x => x.RoomNumber - 1 == _player.CurrentRoomNumber);
+            //  x.RoomNumber is 1-base. _player.CurrentRoomNumber is 0-base
+
+            //  Get the Item inventory of the current room
+            foreach (Item i in _player.Inventory)
+            {
+                //  Using Contains in case of multi word names
+                if (i.Name.ToUpper().Contains(target))
+                {
+                    foundTarget = true;
+
+                    //  Room has an infinite inventory size
+                    if (tempRoom.RoomInventorySize == -1)
+                    {
+                        tempRoom.RoomInventory.Add(i);
+
+                        //  The item was stackable
+                        if (i.IsStackable)
+                        {
+                            //  Player had more than one
+                            if (_player.Inventory.Find(x =>x.Type == i.Type).Quantity < 1)
+                            {
+                                _player.Inventory.Find(x => x.Type == i.Type).Quantity--;
+                                break;
+                            }
+
+                            //  Player only had one
+                            else
+                            {
+                                _player.Inventory.Remove(i);
+                                break;
+                            }
+                        }
+                        //  The item is not stackable
+                        else
+                        {
+                            _player.Inventory.Remove(i);
+                            break;
+                        }
+                    }
+                    //  Room doesn't allow items to be dropped.
+                    else
+                    {
+                        _view.DisplayMessage("I cant drop that here, there's nowhere to put it.");
+                        _view.WaitForAnyKey();
+                        break;
+                    }
+                }
+            }
+
+            //  There is no item with that name
+            if (!foundTarget)
+            {
+                _view.DisplayMessage(string.Format("I don't have a {0}", target));
+                _view.WaitForAnyKey();
+            }
+        }
+
+        /// <summary>
+        /// Command to show the player's inventory.
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public static void ItemList(string playerInput)
+        {
+            _view.DisplayPlayerInventory();
+            _view.WaitForAnyKey();
         }
 
         #endregion // End of [ COMMAND METHODS ] region
