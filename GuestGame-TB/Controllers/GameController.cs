@@ -13,7 +13,9 @@ namespace GuestGame_TB
         public enum GameCommands
         {
             HELP,
-            GO
+            GO,
+            QUIT,
+            LOOK
         }
 
         public enum GameDirections
@@ -37,15 +39,17 @@ namespace GuestGame_TB
             {
                 {GameCommands.GO, MovePlayer },
                 {GameCommands.HELP, HelpQuery },
+                {GameCommands.LOOK, LookAt },
+                {GameCommands.QUIT, ConfirmExit}
             };
-            
+
         #region [ FIELDS ]
 
-        Player _player;
-        Building _building;
-        ConsoleView _view;
-        StaffList _staff;
-        GuardList _guards;
+        private static Player _player;
+        private static Building _building;
+        private static ConsoleView _view;
+        private static StaffList _staff;
+        private static GuardList _guards;
 
         #endregion // End of [ FIELDS ] region
 
@@ -116,9 +120,9 @@ namespace GuestGame_TB
             _view.DisplayClear();
 
             _view.DisplayMessage("Welcome to the game; Aztecan Corporation Protoype Heist.", true);
-            _view.DisplayMessage("Type \"Continue\" to play, or \"Quit\" to exit",false);
+            _view.DisplayMessage("Type \"Continue\" to play, or \"Quit\" to exit", false);
 
-            string input; 
+            string input;
 
             while (!validInput)
             {
@@ -133,10 +137,10 @@ namespace GuestGame_TB
                 {
                     output = false;
                     validInput = true;
-                } 
+                }
                 else
                 {
-                    _view.DisplayMessage("That was not a valid command. The valid commands are \"Continue\" and \"Quit\"",true);
+                    _view.DisplayMessage("That was not a valid command. The valid commands are \"Continue\" and \"Quit\"", true);
                 }
             }
 
@@ -156,7 +160,7 @@ namespace GuestGame_TB
             string name = _view.GetUserInput();
 
             //  Echo inputs
-            _view.DisplayMessage(string.Format("Your name is {0}",name));
+            _view.DisplayMessage(string.Format("Your name is {0}", name));
             _view.WaitForAnyKey();
 
             _view.DisplayClear(); //  Blank screen
@@ -168,7 +172,7 @@ namespace GuestGame_TB
             //  Loop until a valid input
             while (!validGender)
             {
-                if (Enum.TryParse<Character.Genders>(_view.GetUserInput(),true,out gender))
+                if (Enum.TryParse<Character.Genders>(_view.GetUserInput(), true, out gender))
                 {
                     validGender = true;
                 }
@@ -180,7 +184,7 @@ namespace GuestGame_TB
 
             //  Echo inputs
             _view.DisplayMessage(string.Format("Your name is {0}", name));
-            _view.DisplayMessage(string.Format("You are {0}", gender.ToString()),false);
+            _view.DisplayMessage(string.Format("You are {0}", gender.ToString()), false);
             _view.WaitForAnyKey();
 
             _view.DisplayClear(); //  Blank screen
@@ -194,7 +198,7 @@ namespace GuestGame_TB
             Character.Races race = Character.Races.HUMAN;
             while (!validRace)
             {
-                if (Enum.TryParse<Character.Races>(_view.GetUserInput(),true,out race))
+                if (Enum.TryParse<Character.Races>(_view.GetUserInput(), true, out race))
                 {
                     validRace = true;
                 }
@@ -206,7 +210,7 @@ namespace GuestGame_TB
 
             //  Echo inputs
             _view.DisplayMessage(string.Format("Your name is {0}", name));
-            _view.DisplayMessage(string.Format("You are {0}", gender.ToString()),false);
+            _view.DisplayMessage(string.Format("You are {0}", gender.ToString()), false);
 
             //  Make a into an for grammar reasons.
             string aSuffix = "";
@@ -215,7 +219,7 @@ namespace GuestGame_TB
                 aSuffix = "n";
             }
 
-            _view.DisplayMessage(string.Format("You are a{0} {1}",aSuffix, race.ToString()),false);
+            _view.DisplayMessage(string.Format("You are a{0} {1}", aSuffix, race.ToString()), false);
             _view.WaitForAnyKey();
 
             //  Create the player
@@ -303,12 +307,95 @@ namespace GuestGame_TB
 
         #region [ COMMAND METHODS ]
 
+        /// <summary>
+        /// Command for player movement
+        /// </summary>
+        /// <param name="playerInput"></param>
         public static void MovePlayer(string playerInput)
+        {
+            //  Break apart the string, and check it for a direction
+            string[] words = playerInput.Split(' ');
+            GameDirections direction = GameDirections.NORTH;
+            bool validInput = false;
+
+            //  For each word in the input string. (Logically it should only be two, but users input whatever
+            foreach (string word in words)
+            {
+                //  For each possible direction
+                foreach (GameDirections dWord in Enum.GetValues(typeof(GameDirections)))
+                {
+                    //  If a word matches a direction, assign it to direction, set the bool, and get out of the loop.
+                    if (word.ToUpper() == dWord.ToString().ToUpper())
+                    {
+                        direction = dWord;
+                        validInput = true;
+                        break;
+                    }
+                }
+
+                //  Stop checking words once a valid direction has been found.
+                if (validInput)
+                {
+                    break;
+                }
+            }
+
+            //  We werent able to find a valid direction
+            if (validInput == false)
+            {
+                _view.DisplayMessage("There isn't a valid direction in your input.");
+                return;
+            }
+            //  Find the room with a 1-base room number that matches the 0-base player room.
+            Room tempRoom = _building.Rooms.Find(x => x.RoomNumber - 1 == _player.CurrentRoomNumber);
+
+            //  There is a passage in that direction.
+            //  Note: the Passsages array index's match the GameDirections enum index's.
+            if (tempRoom.Passages[(int)direction] != null)
+            {
+                //  Make sure the entrance is the room we're currently in.
+                //  This should always return true
+                if (tempRoom.Passages[(int)direction].Entrance.RoomNumber == tempRoom.RoomNumber)
+                {
+                    //  0-base player roomNumber equals the 1-base roomNumber of the exit.
+                    _player.CurrentRoomNumber = tempRoom.Passages[(int)direction].Exit.RoomNumber - 1;
+                }
+                else
+                {
+                    //Building was incorrectly setup
+                    _view.DisplayMessage(string.Format("Something went wrong, this Passage is in the wrong place! {0}",tempRoom.RoomNumber));
+                }
+            }
+            else
+            {
+                //  There is no passage in that direction, inform the player of this.
+                _view.DisplayMessage(string.Format("I can't go {0}",direction.ToString().ToLower()));
+            }
+        }
+
+        /// <summary>
+        /// Command to display commands
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public static void HelpQuery(string playerInput)
         {
 
         }
 
-        public static void HelpQuery(string playerInput)
+        /// <summary>
+        /// Command to get item information
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public static void LookAt(string playerInput)
+        {
+
+        }
+
+        /// <summary>
+        /// Command to exit game
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public static void ConfirmExit(string playerInput)
         {
 
         }

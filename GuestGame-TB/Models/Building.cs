@@ -85,7 +85,7 @@ namespace GuestGame_TB
             #region South of Building
             //  South of building -> East of building
             passage = new Passage(_rooms.ElementAt(2), _rooms.ElementAt(1));
-            _rooms.ElementAt(0).Passages[2] = passage;  //  Passage is east
+            _rooms.ElementAt(2).Passages[2] = passage;  //  Passage is east
 
             //  South of building -> West of building
             passage = new Passage(_rooms.ElementAt(2), _rooms.ElementAt(3));
