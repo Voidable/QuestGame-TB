@@ -13,10 +13,14 @@ namespace GuestGame_TB
         public enum GameCommands
         {
             GO,
+            MOVE,
             LOOK,
             GRAB,
+            TAKE,
             DROP,
+            LEAVE,
             INVENTORY,
+            ITEMS,
             HELP,
             QUIT
         }
@@ -41,12 +45,16 @@ namespace GuestGame_TB
         public Dictionary<GameCommands, CommandDelegate> commandDictionary = new Dictionary<GameCommands, CommandDelegate>
             {
                 {GameCommands.GO, MovePlayer },
+                {GameCommands.MOVE, MovePlayer },
                 {GameCommands.HELP, HelpQuery },
                 {GameCommands.LOOK, LookAt },
                 {GameCommands.QUIT, ConfirmExit},
                 {GameCommands.GRAB, GrabItem},
                 {GameCommands.DROP, DropItem},
-                {GameCommands.INVENTORY, ItemList}
+                {GameCommands.TAKE, GrabItem},
+                {GameCommands.LEAVE, DropItem},
+                {GameCommands.INVENTORY, ItemList},
+                {GameCommands.ITEMS, ItemList}
             };
 
         #region [ FIELDS ]
@@ -364,8 +372,34 @@ namespace GuestGame_TB
                 //  This should always return true
                 if (tempRoom.Passages[(int)direction].Entrance.RoomNumber == tempRoom.RoomNumber)
                 {
-                    //  0-base player roomNumber equals the 1-base roomNumber of the exit.
-                    _player.CurrentRoomNumber = tempRoom.Passages[(int)direction].Exit.RoomNumber - 1;
+                    //  If the passage is locked
+                    if (tempRoom.Passages[(int)direction].IsLocked)
+                    {
+                        //  Player has unlock item
+                        //  If the player's inventory | Contains an Item | with the same itemtype as the passage's unlock item.
+                        if (_player.Inventory.Contains(_player.Inventory.Find(x => x.Type == tempRoom.Passages[(int)direction].UnlockItem)))
+                        {
+                            //  0-base player roomNumber equals the 1-base roomNumber of the exit.
+                            _player.CurrentRoomNumber = tempRoom.Passages[(int)direction].Exit.RoomNumber - 1;
+                            _view.DisplayMessage(tempRoom.Passages[(int)direction].MoveThrough);
+                            _view.WaitForAnyKey();
+                        }
+                        //  Player does not have unlock item
+                        else
+                        {
+                            _view.DisplayMessage(tempRoom.Passages[(int)direction].LockedResponse);
+                            _view.WaitForAnyKey();
+                        }
+                    }
+                    //  Passage is unlocked
+                    else
+                    {
+                        //  0-base player roomNumber equals the 1-base roomNumber of the exit.
+                        _player.CurrentRoomNumber = tempRoom.Passages[(int)direction].Exit.RoomNumber - 1;
+                        _view.DisplayMessage(tempRoom.Passages[(int)direction].MoveThrough);
+                        _view.WaitForAnyKey();
+                    }
+
                 }
                 else
                 {
@@ -555,7 +589,7 @@ namespace GuestGame_TB
             //  x.RoomNumber is 1-base. _player.CurrentRoomNumber is 0-base
 
             //  Get the Item inventory of the current room
-            foreach(Item i in tempRoom.RoomInventory)
+            foreach (Item i in tempRoom.RoomInventory)
             {
                 //  Found the target item - using Contains incase of multi word names
                 if (i.Name.ToUpper().Contains(target))
@@ -687,7 +721,7 @@ namespace GuestGame_TB
                         if (i.IsStackable)
                         {
                             //  Player had more than one
-                            if (_player.Inventory.Find(x =>x.Type == i.Type).Quantity < 1)
+                            if (_player.Inventory.Find(x => x.Type == i.Type).Quantity < 1)
                             {
                                 _player.Inventory.Find(x => x.Type == i.Type).Quantity--;
                                 break;

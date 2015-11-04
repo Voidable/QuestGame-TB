@@ -83,45 +83,58 @@ namespace GuestGame_TB
             #region North of Building
             //  North of building -> East of building
             passage = new Passage(_rooms.ElementAt(0), _rooms.ElementAt(1));
+            passage.MoveThrough = "You travel to the alley.";
             _rooms.ElementAt(0).Passages[2] = passage;  //  Passage is east
 
             //  North of building -> West of building
             passage = new Passage(_rooms.ElementAt(0), _rooms.ElementAt(3));
+            passage.MoveThrough = "You travel to the road.";
             _rooms.ElementAt(0).Passages[6] = passage;  //  Passage is west
 
             //  North of building -> Northern lobby
             passage = new Passage(_rooms.ElementAt(0), _rooms.ElementAt(4));
+            passage.MoveThrough = "You enter the building.";
             _rooms.ElementAt(0).Passages[4] = passage;  //  Passage is south
             #endregion
             #region East of Building
             //  East of building -> North of building
             passage = new Passage(_rooms.ElementAt(1), _rooms.ElementAt(0));
+            passage.MoveThrough = "You exit the alley to the north.";
             _rooms.ElementAt(1).Passages[0] = passage;  //  Passage is north
 
             //  East of building -> South of building
             passage = new Passage(_rooms.ElementAt(1), _rooms.ElementAt(2));
+            passage.MoveThrough = "You exit the alley to the south.";
             _rooms.ElementAt(1).Passages[4] = passage;  //  Passage is south
             #endregion
             #region South of Building
             //  South of building -> East of building
             passage = new Passage(_rooms.ElementAt(2), _rooms.ElementAt(1));
+            passage.MoveThrough = "You go to the alley.";
             _rooms.ElementAt(2).Passages[2] = passage;  //  Passage is east
 
             //  South of building -> West of building
             passage = new Passage(_rooms.ElementAt(2), _rooms.ElementAt(3));
+            passage.MoveThrough = "You go to the road.";
             _rooms.ElementAt(2).Passages[6] = passage;  //  Passage is west
 
             //  South of building -> Employee break room
             passage = new Passage(_rooms.ElementAt(2), _rooms.ElementAt(6));
+            passage.IsLocked = true;
+            passage.UnlockItem = Item.ItemTypes.KEYCARD001;
+            passage.LockedResponse = "You can't open the door. You need a Key-Card.";
+            passage.MoveThrough = "You swipe the Key-Card, the door lets you through.";
             _rooms.ElementAt(2).Passages[0] = passage;  //  Passage is north
             #endregion
             #region West of Building
             //  West of building -> North of building
             passage = new Passage(_rooms.ElementAt(3), _rooms.ElementAt(0));
+            passage.MoveThrough = "You follow the road north.";
             _rooms.ElementAt(3).Passages[0] = passage;  //  Passage is north
 
             //  West of building -> South of building
             passage = new Passage(_rooms.ElementAt(3), _rooms.ElementAt(2));
+            passage.MoveThrough = "You follow the road south.";
             _rooms.ElementAt(3).Passages[4] = passage;  //  Passage is south
             #endregion
             #endregion
@@ -129,31 +142,40 @@ namespace GuestGame_TB
             #region Northern Lobby
             //  Northern Lobby -> North of building
             passage = new Passage(_rooms.ElementAt(4), _rooms.ElementAt(0));
+            passage.MoveThrough = "You exit the building to the north.";
             _rooms.ElementAt(4).Passages[0] = passage;  //  Passage is north
 
             //  Northern Lobby -> Southern Lobby
             passage = new Passage(_rooms.ElementAt(4), _rooms.ElementAt(5));
+            passage.MoveThrough = "You go further inside the lobby.";
             _rooms.ElementAt(4).Passages[4] = passage;  //  Passage is south
             #endregion
             #region Southern Lobby
             //  Southern Lobby -> Northern Lobby
             passage = new Passage(_rooms.ElementAt(5), _rooms.ElementAt(4));
+            passage.MoveThrough = "You move closer to the exit.";
             _rooms.ElementAt(5).Passages[0] = passage;  //  Passage is north
 
             //  Southern Lobby -> Employee break room
             passage = new Passage(_rooms.ElementAt(5), _rooms.ElementAt(6));
+            passage.IsLocked = true;
+            passage.UnlockItem = Item.ItemTypes.KEYCARD001;
+            passage.MoveThrough = "You swipe the Key-card. The door lets you through.";
+            passage.LockedResponse = "You can't open the door. You need a Key-Card.";
             _rooms.ElementAt(5).Passages[4] = passage;  //  Passage is south
+
             #endregion
             #region Employee Break Room
             //  Employee Break -> Southern Lobby
             passage = new Passage(_rooms.ElementAt(6), _rooms.ElementAt(5));
+            passage.MoveThrough = "You go north to the lobby. The door locks behind you.";
             _rooms.ElementAt(6).Passages[0] = passage;  //  Passage is north
 
             //  Employee Break -> South of building
             passage = new Passage(_rooms.ElementAt(6), _rooms.ElementAt(2));
+            passage.MoveThrough = "You exit the building to the south. The door locks behind you.";
             _rooms.ElementAt(6).Passages[4] = passage;  //  Passage is south
             #endregion
-
             #endregion
         }
 
