@@ -60,8 +60,8 @@ namespace GuestGame_TB
 
             output = string.Format("{2} {1}. {4} nametag reads {0}. {3}",
                 base.Name,
-                base.Gender.ToString().ToLower(),
-                base.Race.ToString().ToLower(),
+                base.Gender.ToString(),
+                base.Race.ToString(),
                 base.Description,
                 hisHer);
 

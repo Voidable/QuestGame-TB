@@ -54,8 +54,8 @@ namespace GuestGame_TB
 
             output = string.Format("{0} is a {1} {2}. {3}",
                 base.Name,
-                base.Gender.ToString().ToLower(),
-                base.Race.ToString().ToLower(),
+                base.Gender.ToString(),
+                base.Race.ToString(),
                 base.Description);
 
             return output;

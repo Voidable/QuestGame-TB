@@ -389,11 +389,13 @@ namespace GuestGame_TB
         public static void HelpQuery(string playerInput)
         {
             _view.DisplayMessage("The recognized command verbs are:");
+            _view.DisplayMessage("", false);
             foreach (GameCommands c in Enum.GetValues(typeof(GameCommands)))
             {
                 _view.DisplayMessage(c.ToString(), false);
             }
             _view.DisplayMessage("The recognized directions are:");
+            _view.DisplayMessage("", false);
             foreach (GameDirections d in Enum.GetValues(typeof(GameDirections)))
             {
                 _view.DisplayMessage(d.ToString(), false);
