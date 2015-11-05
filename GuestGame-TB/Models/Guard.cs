@@ -8,7 +8,7 @@ namespace GuestGame_TB
 {
     class Guard : Character
     {
-                #region [ FIELDS ]
+        #region [ FIELDS ]
 
         //  Guard's current room
         private int _currentRoomNumber;

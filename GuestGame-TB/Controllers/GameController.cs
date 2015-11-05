@@ -15,6 +15,7 @@ namespace GuestGame_TB
             GO,
             MOVE,
             LOOK,
+            TALK,
             GRAB,
             TAKE,
             DROP,
@@ -48,6 +49,7 @@ namespace GuestGame_TB
                 {GameCommands.MOVE, MovePlayer },
                 {GameCommands.HELP, HelpQuery },
                 {GameCommands.LOOK, LookAt },
+                {GameCommands.TALK, TalkTo },
                 {GameCommands.QUIT, ConfirmExit},
                 {GameCommands.GRAB, GrabItem},
                 {GameCommands.DROP, DropItem},
@@ -518,9 +520,107 @@ namespace GuestGame_TB
                 //  x.RoomNumber is 1-base. _player.CurrentRoomNumber is 0-base
                 (x => x.RoomNumber - 1 == _player.CurrentRoomNumber).RoomInventory)
             {
-                if (i.Name.ToUpper() == target)
+                //  Use Contains for multi-word names
+                if (i.Name.ToUpper().Contains(target))
                 {
                     _view.DisplayMessage(i.Description);
+                    foundTarget = true;
+                }
+            }
+
+            if (!foundTarget)
+            {
+                _view.DisplayMessage(string.Format("I cant see anything called {0}", target.ToLower()));
+            }
+
+            //  Wait for the player before refreshing the view.
+            _view.WaitForAnyKey();
+        }
+
+        /// <summary>
+        /// Command to talk to things
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public static void TalkTo(string playerInput)
+        {
+            //  Split the input into words
+            string[] words = playerInput.Split(' ');
+            string target = "";
+            bool foundTarget = false;
+
+            // A single word, or two words with the second being "TO" means insufficient input
+            if ((words.Count() <= 1) || (words.Count() == 2 & words[1].ToUpper() == "TO"))
+            {
+                _view.DisplayMessage("You need to tell me what to talk to.");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Two words where the second isn't "TO" assume second word is target
+            else if (words.Count() == 2 & words[1].ToUpper() != "TO")
+            {
+                target = words[1].ToUpper();
+            }
+
+            //  Three or more words where the second is "AT", assume third word is target
+            else if (words.Count() >= 3 & words[1].ToUpper() == "TO")
+            {
+                target = words[2].ToUpper();
+            }
+
+            //  Couldn't interpret the input based on prior rules
+            else
+            {
+                _view.DisplayMessage("I couldn't understand that. I understand \"Talk NOUN\" and \"Talk to NOUN\".");
+                _view.WaitForAnyKey();
+                return;
+            }
+
+            //  Check if the target is the player
+            string[] playerReference = new string[] { "ME", "MYSELF" };
+            if (playerReference.Contains(target))
+            {
+                _view.DisplayMessage("I'm not going to start talking to myself");
+                foundTarget = true;
+            }
+
+            //  Check the guards for target match
+            foreach (Guard g in _guards.Guards)
+            {
+                if (g.CurrentRoomNumber == _player.CurrentRoomNumber)
+                {
+                    if (g.Name.ToUpper() == target)
+                    {
+                        _view.DisplayMessage(g.Greeting);
+                        foundTarget = true;
+                    }
+                }
+            }
+
+            //  Check the staff for target match
+            foreach (Staff s in _staff.StaffMembers)
+            {
+                if (s.CurrentRoomNumber == _player.CurrentRoomNumber)
+                {
+                    if (s.Name.ToUpper() == target)
+                    {
+                        _view.DisplayMessage(s.Greeting);
+                        foundTarget = true;
+                    }
+                }
+            }
+
+            //  Check the items for target match
+            foreach
+                //  Get the Item inventory of the current room
+                (Item i in _building.Rooms.Find
+                //  x.RoomNumber is 1-base. _player.CurrentRoomNumber is 0-base
+                (x => x.RoomNumber - 1 == _player.CurrentRoomNumber).RoomInventory)
+            {
+                //  Use Contains for multi-word names
+                if (i.Name.ToUpper().Contains(target))
+                {
+                    _view.DisplayMessage(string.Format("You talk to the {0}, but it doesn't respond.",i.Name));
                     foundTarget = true;
                 }
             }
