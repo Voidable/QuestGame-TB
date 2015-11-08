@@ -763,6 +763,7 @@ namespace GuestGame_TB
             if (!foundTarget)
             {
                 _view.DisplayMessage(string.Format("I can't see a {0} here", target));
+                _view.WaitForAnyKey();
             }
         }
 
